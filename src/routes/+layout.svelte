@@ -24,7 +24,7 @@
 	<meta property="keywords" content={config.site.keywords} />
 	<meta property="description" content={config.site.description} />
 	<meta property="author" content="polarity" />
-	<meta property="og:site_name" content={config.site.name} />
+	<meta property="og:site_name" content={config.site.site_name} />
 	<meta property="og:title" content={config.site.name} />
 	<meta property="og:url" content={config.site.url} />
 	<meta property="og:description" content={config.site.description} />

@@ -7,7 +7,8 @@ const links = {
 };
 
 const site = {
-	name: 'Virtual Olympiad',
+	site_name: 'Virtual Olympiad',
+	name: 'VODB ⸱ Virtual Olympiad Database',
 	url: 'https://vodb.mathetal.org',
 	ogImage: 'https://vodb.mathetal.org/vodb.png',
 	description: 'Massive database of categorized and indexed contest problems.',
