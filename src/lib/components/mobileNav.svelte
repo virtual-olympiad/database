@@ -23,8 +23,8 @@
 	</Sheet.Trigger>
 	<Sheet.Content side="left" class="pr-0">
 		<MobileLink href="/" class="flex items-center" bind:open>
-            <img src="/vo.png" alt="Virtual Olympiad Logo" class="mr-4 h-4 w-4" />
-			<span class="font-bold">Virtual Olympiad</span>
+            <img src="/vodb.png" alt="Virtual Olympiad Database Logo" class="mr-4 h-4 w-4" />
+			<span class="font-bold">VOLY <span class="font-light">Database</span></span>
 		</MobileLink>
 		<ScrollArea orientation="both" class="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
 			<div class="flex flex-col space-y-3">

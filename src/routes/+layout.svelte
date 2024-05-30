@@ -39,7 +39,7 @@
 	<div class="container flex h-14 max-w-screen-2xl items-center">
 		<div class="mr-4 hidden md:flex">
 			<a href="/" class="mr-6 flex items-center space-x-2">
-				<img src="/vodb.png" alt="Virtual Olympiad Logo" class="h-7 w-7" />
+				<img src="/vodb.png" alt="Virtual Olympiad Database Logo" class="h-7 w-7" />
 				<span class="hidden select-none font-bold tracking-tight sm:inline-block">
 					VOLY <span class="font-light">Database</span></span
 				>
