@@ -20,10 +20,10 @@ const nav = [
 		title: 'Search',
 		href: '/search'
 	},
-	{
+	/**{
 		title: 'API',
 		href: '/api'
-	},
+	},**/
 	{
 		title: 'About',
 		href: '/about'

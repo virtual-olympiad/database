@@ -77,7 +77,6 @@
 				<DropdownMenu.Trigger asChild let:builder>
 					<Button variant="ghost" builders={[builder]} class="relative ml-2 h-8 w-8 rounded-full">
 						<Avatar.Root class="h-8 w-8">
-							<Avatar.Image src="/avatars/01.png" alt="@shadcn" />
 							<Avatar.Fallback>M</Avatar.Fallback>
 						</Avatar.Root>
 					</Button>
