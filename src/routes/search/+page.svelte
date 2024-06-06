@@ -1,46 +1,37 @@
 <script lang="ts">
-	import Button from '$lib/components/ui/button/button.svelte';
-	import * as Card from '$lib/components/ui/card/index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
-	import * as Avatar from '$lib/components/ui/avatar/index.js';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index';
-	import * as Tooltip from '$lib/components/ui/tooltip';
-	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
-	import * as Collapsible from '$lib/components/ui/collapsible/index';
-	import { Separator } from '$lib/components/ui/separator';
-	import { GithubLogo } from 'svelte-radix';
-	import {
-		Activity,
-		Star,
-		ChevronDown,
-		Plus,
-		Circle,
-		Heart,
-		Gauge,
-		Slash,
-		Hash,
-		ChevronRight,
-		ChevronsUpDown,
-		Search
-	} from 'lucide-svelte';
-	import * as config from '$lib/siteConfig';
 
-	import katex from 'katex';
-	import { Content } from '$lib/components/ui/drawer';
-
+	import TableFilter from './table-filter.svelte';
 	import DataTable from './table.svelte';
 	import Problem from './problem.svelte';
+	import { writable, type Writable } from 'svelte/store';
 
 	export let data;
 
 	let problems: DisplayProblem[] = data.problems as DisplayProblem[];
+	let titleFilter: string = '';
+	let otherFilter: tableOtherFilters = {
+		minDifficulty: 0,
+		maxDifficulty: 10,
+		collection: ''
+	};
 </script>
 
-<section
-	class="flex flex-col w-[350px] md:w-[500px] lg:w-[640px] items-center gap-2 py-8 text-center md:py-12 md:pb-8 lg:py-24 lg:pb-12"
->	
-	{#key data.selected_problem}
-		<Problem id = {data.selected_problem} />
-	{/key}
-	<DataTable data={problems} bind:selected_problem={data.selected_problem}/>
+<section class="w-full max-w-[1536px] p-4">
+	<TableFilter collections={data.collections} bind:otherFilter bind:titleFilter />
+	<div class="w-full gap-4 lg:grid lg:grid-cols-2">
+		<div
+			class="relative order-[-1] flex h-full w-full flex-col rounded-xl bg-muted/50 p-4 mb-4 lg:mb-0 lg:order-1"
+		>
+			{#key data.selected_problem}
+				<Problem id={data.selected_problem} />
+			{/key}
+		</div>
+		<DataTable
+			data={problems}
+			bind:otherFilter
+			bind:titleFilter
+			bind:selected_problem={data.selected_problem}
+		/>
+	</div>
 </section>

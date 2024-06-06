@@ -4,6 +4,7 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Separator } from '$lib/components/ui/separator';
 	import { Button } from '$lib/components/ui/button';
+	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 
@@ -11,7 +12,7 @@
 
 	export let id;
 
-    const sleep = (delay: number) => new Promise((resolve) => setTimeout(resolve, delay));
+	const sleep = (delay: number) => new Promise((resolve) => setTimeout(resolve, delay));
 
 	const refreshProblem = async (): Promise<Problem> => {
 		let response = await fetch(`/api?problem_id=${id}`);
@@ -22,7 +23,7 @@
 </script>
 
 {#await promise}
-	<Card.Root class="w-full max-w-[480px]">
+	<Card.Root class="w-full">
 		<Card.Header>
 			<Breadcrumb.Root>
 				<Breadcrumb.List>
@@ -67,10 +68,10 @@
 			</div>
 		</Card.Header>
 		<Card.Content class="relative block">
-			<div class="mb-2 text-sm space-y-2">
-                <Skeleton class="h-4 w-[230px]" />
+			<div class="mb-2 space-y-2 text-sm">
+				<Skeleton class="h-4 w-[230px]" />
 				<Skeleton class="h-4 w-[200px]" />
-                <Skeleton class="h-4 w-[250px]" />
+				<Skeleton class="h-4 w-[250px]" />
 			</div>
 			<div class="flex space-x-4 text-sm text-muted-foreground">
 				<div class="flex items-center">
@@ -89,7 +90,7 @@
 		</Card.Content>
 	</Card.Root>
 {:then problem}
-	<Card.Root class="max-w-[480px]">
+	<Card.Root class="w-full">
 		<Card.Header>
 			<Breadcrumb.Root>
 				<Breadcrumb.List>
@@ -104,7 +105,12 @@
 			</Breadcrumb.Root>
 			<div class="grid grid-cols-[1fr_110px] items-center gap-4 space-y-0">
 				<div>
-					<Card.Title>{problem?.common_title ?? ''}</Card.Title>
+					<Card.Title>
+						{problem?.common_title ?? ''}
+						{#if problem?.duplicate}
+							<Badge variant="outline" class="ml-2 align-middle">Duplicate</Badge>
+						{/if}
+					</Card.Title>
 				</div>
 				<div class="flex items-center space-x-1 rounded-md bg-secondary text-secondary-foreground">
 					<Button variant="secondary" class="px-3 shadow-none">
@@ -134,7 +140,7 @@
 			</div>
 		</Card.Header>
 		<Card.Content class="relative block">
-			<div class="mb-2 text-sm">
+			<div class="math-wrapper mb-2 w-full overflow-x-auto overflow-y-hidden text-sm">
 				{@html problem?.content ?? ''}
 			</div>
 			<div class="flex space-x-4 text-sm text-muted-foreground">
@@ -145,9 +151,9 @@
 				<div class="flex items-center">
 					<Gauge class="mr-1 h-3 w-3" />
 					<Tooltip.Root>
-						<Tooltip.Trigger>{problem.metadata.difficulty?.toFixed(0) ?? "?"}</Tooltip.Trigger>
+						<Tooltip.Trigger>{problem.metadata.difficulty?.toFixed(1) ?? '?'}</Tooltip.Trigger>
 						<Tooltip.Content>
-							<p>Difficulty: {problem.metadata.difficulty?.toFixed(2) ?? "?"}/10</p>
+							<p>Difficulty: {problem.metadata.difficulty?.toFixed(2) ?? '?'}/10</p>
 						</Tooltip.Content>
 					</Tooltip.Root>
 				</div>

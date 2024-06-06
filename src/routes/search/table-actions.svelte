@@ -3,7 +3,7 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Button } from '$lib/components/ui/button';
 
-	export let id: string;
+	export let id: string, source_href: string;
 </script>
 
 <Button variant="ghost" size="icon" class="relative h-8 w-8 p-0">
@@ -20,9 +20,11 @@
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content side="right">
 		<DropdownMenu.Group>
-			<DropdownMenu.Label>Actions</DropdownMenu.Label>
 			<DropdownMenu.Item>
 				Open in Judge
+			</DropdownMenu.Item>
+			<DropdownMenu.Item target="_blank" rel="noreferrer" href={source_href}>
+				Open in AoPS
 			</DropdownMenu.Item>
 		</DropdownMenu.Group>
 		<DropdownMenu.Separator />

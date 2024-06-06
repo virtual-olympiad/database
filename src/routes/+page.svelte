@@ -145,7 +145,7 @@
 				<GithubLogo class="mr-2 h-4 w-4" />
 				GitHub
 			</Button>
-			<Button target="_blank" rel="noreferrer" href="/search">Access VODB</Button>
+			<Button href="/search">Access VODB</Button>
 		</Card.Footer>
 	</Card.Root>
 	<Card.Root class="flex w-[350px] lg:w-[450px] flex-col justify-between">

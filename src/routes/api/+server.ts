@@ -88,24 +88,32 @@ export async function GET({ url }) {
 					vodb_collections (
 						common_title
 					)
-				)
+				),
+				metadata->tags,
+				metadata->difficulty,
+				metadata->source_href
 			`
 		)
-		.order('slug')
-		.limit(50);
+		.order('slug');
 
 	if (e) {
 		error(status, statusText);
 	}
 
-	const problems = data?.map(({ id, slug, common_title, vodb_sources }) => {
+	const problems = data?.map(({ id, slug, common_title, vodb_sources, tags, difficulty, source_href }) => {
 		const source = vodb_sources as any;
 
 		return {
 			id,
 			slug,
 			common_title,
-			source: source.vodb_collections.common_title + ' ' + source.edition
+			source: source.vodb_collections.common_title + ' ' + source.edition,
+			collection: source.vodb_collections.common_title,
+			metadata: {
+				tags,
+				difficulty,
+				source_href
+			}
 		};
 	});
 
