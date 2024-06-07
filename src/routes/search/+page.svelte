@@ -20,7 +20,7 @@
 	<TableFilter collections={data.collections} bind:otherFilter bind:titleFilter />
 	<div class="w-full gap-4 lg:grid lg:grid-cols-2">
 		<div
-			class="relative order-[-1] flex h-full w-full flex-col rounded-xl bg-muted/50 p-4 mb-4 lg:mb-0 lg:order-1"
+			class="relative order-[-1] flex h-full w-full flex-col rounded-xl bg-muted/50 p-2 lg:p-4 mb-4 lg:mb-0 lg:order-1"
 		>
 			{#key data.selected_problem}
 				<Problem id={data.selected_problem} />

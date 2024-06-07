@@ -20,6 +20,7 @@
 	import DataTableCheckbox from './table-checkbox.svelte';
 	import DataTableActions from './table-actions.svelte';
 	import { parseDate } from '@internationalized/date';
+	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
 
 	export let data: DisplayProblem[], selected_problem: string;
 
@@ -76,7 +77,7 @@
 			header: 'Source',
 			plugins: {
 				sort: {
-					disable: true,
+					disable: true
 				}
 			}
 		}),
@@ -102,11 +103,16 @@
 					fn: ({ filterValue, value }) => {
 						let date = parseDate(value.date);
 
-						return (!filterValue.collection || value.collection === filterValue.collection)
-						&& (!value.difficulty || filterValue.minDifficulty <= value.difficulty && value.difficulty <= filterValue.maxDifficulty)
-						&& (!filterValue.ids || filterValue.ids.includes(value.id))
-						&& (!filterValue.minDate || !filterValue.maxDate || (date.compare(filterValue.minDate) >= 0 && 
-						date.compare(filterValue.maxDate) <= 0))
+						return (
+							(!filterValue.collection || value.collection === filterValue.collection) &&
+							(!value.difficulty ||
+								(filterValue.minDifficulty <= value.difficulty &&
+									value.difficulty <= filterValue.maxDifficulty)) &&
+							(!filterValue.ids || filterValue.ids.includes(value.id)) &&
+							(!filterValue.minDate ||
+								!filterValue.maxDate ||
+								(date.compare(filterValue.minDate) >= 0 && date.compare(filterValue.maxDate) <= 0))
+						);
 						// && (!filterValue.tags || value.tags === filterValue.tags)
 					}
 				}
@@ -133,13 +139,14 @@
 	export let titleFilter: string, otherFilter: tableOtherFilters;
 
 	$: pluginTitleFilter.set(titleFilter ?? '');
-	$: otherFilter && pluginOtherFilter.set({
-		"": otherFilter
-	});
+	$: otherFilter &&
+		pluginOtherFilter.set({
+			'': otherFilter
+		});
 </script>
 
 <div class="flex w-full flex-col">
-	<div class="w-full rounded-md border overflow-auto">
+	<div class="w-full overflow-auto rounded-md border">
 		<Table.Root {...$tableAttrs}>
 			<Table.Header>
 				{#each $headerRows as headerRow}
@@ -147,9 +154,7 @@
 						<Table.Row>
 							{#each headerRow.cells as cell (cell.id)}
 								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
-									<Table.Head
-										{...attrs}
-									>
+									<Table.Head {...attrs}>
 										{#if cell.id === 'common_title'}
 											<Button class="mx-auto" variant="ghost" on:click={props.sort.toggle}>
 												<Render of={cell.render()} />
@@ -186,7 +191,6 @@
 													<Render of={cell.render()} />
 												</Button>
 											</div>
-										
 										{:else}
 											<div class="text-left">
 												<Render of={cell.render()} />
@@ -201,24 +205,63 @@
 			</Table.Body>
 		</Table.Root>
 	</div>
-	<div class="flex items-center justify-between space-x-4 py-4">
-		<div class="mr-auto text-sm text-muted-foreground">
-			{Object.keys($selectedDataIds).length} of {$rows.length + "/" + data.length} problem(s) selected.
+	<div class="flex items-start justify-between space-x-4 py-4">
+		<div class="text-sm text-muted-foreground">
+			{Object.keys($selectedDataIds).length} of {$rows.length + '/' + data.length} problem(s) selected.
 		</div>
-		<div class="flex items-center justify-end space-x-4">
+		<div class="hidden items-center justify-end space-x-4 sm:flex">
 			<Button
 				variant="outline"
 				size="sm"
 				on:click={() => ($pageIndex = Number($pageIndex) - 1)}
-				disabled={!$hasPreviousPage}>Previous</Button
+				disabled={!$hasPreviousPage}
 			>
-			<Input type="number" placeholder="0" min={0} max={Math.ceil($rows.length/5) - 1} bind:value={$pageIndex} class="h-9 max-w-[80px]" />
+				Previous
+			</Button>
+			<Input
+				type="number"
+				placeholder="0"
+				min={0}
+				max={Math.ceil($rows.length / 5) - 1}
+				bind:value={$pageIndex}
+				class="h-9 max-w-[80px]"
+			/>
 			<Button
 				variant="outline"
 				size="sm"
 				disabled={!$hasNextPage}
-				on:click={() => ($pageIndex = Number($pageIndex) + 1)}>Next</Button
+				on:click={() => ($pageIndex = Number($pageIndex) + 1)}
 			>
+				Next
+			</Button>
+		</div>
+		<div class="flex items-center justify-end space-x-2 sm:hidden">
+			<Button
+				variant="outline"
+				size="sm"
+				on:click={() => ($pageIndex = Number($pageIndex) - 1)}
+				disabled={!$hasPreviousPage}
+				class="px-2"
+			>
+				<ChevronLeft class="h-4 w-4"/>
+			</Button>
+			<Input
+				type="number"
+				placeholder="0"
+				min={0}
+				max={Math.ceil($rows.length / 5) - 1}
+				bind:value={$pageIndex}
+				class="h-9 p-2 pr-1 min-w-[60px] max-w-[80px]"
+			/>
+			<Button
+				variant="outline"
+				size="sm"
+				disabled={!$hasNextPage}
+				on:click={() => ($pageIndex = Number($pageIndex) + 1)}
+				class="px-2"
+			>
+				<ChevronRight class="h-4 w-4"/>
+			</Button>
 		</div>
 	</div>
 </div>
