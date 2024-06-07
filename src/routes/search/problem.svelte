@@ -9,7 +9,7 @@
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import * as Collapsible from '$lib/components/ui/collapsible';
 
-	import { Circle, ChevronDown, Heart, Plus, Gauge, Eye } from 'lucide-svelte';
+	import { Circle, ChevronDown, Heart, Plus, Gauge, Eye, PenLine, Ellipsis } from 'lucide-svelte';
 
 	export let id;
 
@@ -17,53 +17,64 @@
 
 	const refreshProblem = async (): Promise<Problem> => {
 		let response = await fetch(`/api?problemId=${encodeURIComponent(id)}`);
+		// await sleep(1000000);
 		return await response.json();
 	};
 
 	let promise = refreshProblem();
 
 	const parseAnswerType = (type: string) => {
-		if (type == 'number:integer'){
+		if (type == 'number:integer') {
 			return 'Integer';
-		} 
-		
-		if (type == 'select:single'){
+		}
+
+		if (type == 'select:single') {
 			return 'Single-Select Choice';
 		}
-		
-		if (type == 'select:multiple'){
+
+		if (type == 'select:multiple') {
 			return 'Multi-Select Choice';
 		}
-	}
+	};
 </script>
 
 {#await promise}
 	<Card.Root class="w-full">
-		<Card.Header>
-			<Breadcrumb.Root>
-				<Breadcrumb.List>
-					<Breadcrumb.Item>
-						<Breadcrumb.Link><Skeleton class="h-4 w-4" /></Breadcrumb.Link>
-					</Breadcrumb.Item>
-					<Breadcrumb.Separator />
-					<Breadcrumb.Item>
-						<Breadcrumb.Link><Skeleton class="h-4 w-8" /></Breadcrumb.Link>
-					</Breadcrumb.Item>
-				</Breadcrumb.List>
-			</Breadcrumb.Root>
+		<Card.Header class="pt-5">
+			<div class="flex w-full items-center justify-between">
+				<Breadcrumb.Root>
+					<Breadcrumb.List>
+						<Breadcrumb.Item>
+							<Breadcrumb.Link><Skeleton class="h-4 w-4" /></Breadcrumb.Link>
+						</Breadcrumb.Item>
+						<Breadcrumb.Separator />
+						<Breadcrumb.Item>
+							<Breadcrumb.Link><Skeleton class="h-4 w-8" /></Breadcrumb.Link>
+						</Breadcrumb.Item>
+					</Breadcrumb.List>
+				</Breadcrumb.Root>
+				<DropdownMenu.Root>
+					<DropdownMenu.Trigger asChild let:builder>
+						<Button disabled variant="ghost" builders={[builder]} size="icon" class="relative h-8 w-8 p-0">
+							<span class="sr-only">Open menu</span>
+							<Ellipsis class="h-4 w-4" />
+						</Button>
+					</DropdownMenu.Trigger>
+				</DropdownMenu.Root>
+			</div>
 			<div class="grid grid-cols-[1fr_110px] items-center gap-4 space-y-0">
 				<div>
 					<Card.Title><Skeleton class="h-4 w-[100px]" /></Card.Title>
 				</div>
-				<div class="flex items-center space-x-1 rounded-md bg-secondary text-secondary-foreground">
-					<Button variant="secondary" class="px-3 shadow-none">
+				<div class="flex items-center rounded-md bg-secondary text-secondary-foreground">
+					<Button disabled variant="secondary" class="px-3 shadow-none">
 						<Heart class="mr-2 h-4 w-4" />
 						Like
 					</Button>
 					<Separator orientation="vertical" class="h-[20px]" />
 					<DropdownMenu.Root>
 						<DropdownMenu.Trigger asChild let:builder>
-							<Button builders={[builder]} variant="secondary" class="px-2 shadow-none">
+							<Button disabled builders={[builder]} variant="secondary" class="px-2 shadow-none">
 								<ChevronDown class="h-4 w-4 text-secondary-foreground" />
 							</Button>
 						</DropdownMenu.Trigger>
@@ -83,11 +94,15 @@
 			</div>
 		</Card.Header>
 		<Card.Content class="relative block">
-			<div class="mb-2 space-y-2 text-sm">
+			<div class="mb-4 space-y-2 text-sm">
 				<Skeleton class="h-4 w-[230px]" />
 				<Skeleton class="h-4 w-[200px]" />
 				<Skeleton class="h-4 w-[250px]" />
 			</div>
+			<Separator />
+			<Collapsible.Root class="mt-2 mb-4 w-fit space-y-1">
+				<Skeleton class="h-4 w-[200px]" />
+			</Collapsible.Root>
 			<div class="flex space-x-4 text-sm text-muted-foreground">
 				<div class="flex items-center">
 					<Circle class="mr-1 h-3 w-3 fill-sky-400 text-sky-400" />
@@ -95,6 +110,10 @@
 				</div>
 				<div class="flex items-center">
 					<Gauge class="mr-1 h-3 w-3" />
+					<Skeleton class="h-4 w-4" />
+				</div>
+				<div class="flex items-center">
+					<PenLine class="mr-1 h-3 w-3" />
 					<Skeleton class="h-4 w-4" />
 				</div>
 				<div class="!ml-auto flex items-center">
@@ -106,18 +125,44 @@
 	</Card.Root>
 {:then problem}
 	<Card.Root class="w-full">
-		<Card.Header>
-			<Breadcrumb.Root>
-				<Breadcrumb.List>
-					<Breadcrumb.Item>
-						<Breadcrumb.Link>{problem?.collection ?? ''}</Breadcrumb.Link>
-					</Breadcrumb.Item>
-					<Breadcrumb.Separator />
-					<Breadcrumb.Item>
-						<Breadcrumb.Link>{problem?.edition ?? ''}</Breadcrumb.Link>
-					</Breadcrumb.Item>
-				</Breadcrumb.List>
-			</Breadcrumb.Root>
+		<Card.Header class="pt-5">
+			<div class="flex w-full items-center justify-between">
+				<Breadcrumb.Root>
+					<Breadcrumb.List>
+						<Breadcrumb.Item>
+							<Breadcrumb.Link>{problem?.collection ?? ''}</Breadcrumb.Link>
+						</Breadcrumb.Item>
+						<Breadcrumb.Separator />
+						<Breadcrumb.Item>
+							<Breadcrumb.Link>{problem?.edition ?? ''}</Breadcrumb.Link>
+						</Breadcrumb.Item>
+					</Breadcrumb.List>
+				</Breadcrumb.Root>
+				<DropdownMenu.Root>
+					<DropdownMenu.Trigger asChild let:builder>
+						<Button variant="ghost" builders={[builder]} size="icon" class="relative h-8 w-8 p-0">
+							<span class="sr-only">Open menu</span>
+							<Ellipsis class="h-4 w-4" />
+						</Button>
+					</DropdownMenu.Trigger>
+					<DropdownMenu.Content side="right">
+						<DropdownMenu.Group>
+							<DropdownMenu.Item disabled>Open in Judge</DropdownMenu.Item>
+							<DropdownMenu.Item
+								target="_blank"
+								rel="noreferrer"
+								href={problem.metadata.source_href ?? ''}
+							>
+								Open in AoPS
+							</DropdownMenu.Item>
+						</DropdownMenu.Group>
+						<DropdownMenu.Separator />
+						<DropdownMenu.Item on:click={() => navigator.clipboard.writeText(id)}
+							>Copy Problem ID</DropdownMenu.Item
+						>
+					</DropdownMenu.Content>
+				</DropdownMenu.Root>
+			</div>
 			<div class="grid grid-cols-[1fr_110px] items-center gap-4 space-y-0">
 				<div>
 					<Card.Title>
@@ -135,7 +180,7 @@
 						{/if}
 					</Card.Title>
 				</div>
-				<div class="flex items-center space-x-1 rounded-md bg-secondary text-secondary-foreground">
+				<div class="flex items-center rounded-md bg-secondary text-secondary-foreground">
 					<Button variant="secondary" class="px-3 shadow-none">
 						<Heart class="mr-2 h-4 w-4" />
 						Like
@@ -167,7 +212,7 @@
 				{@html problem?.content ?? ''}
 			</div>
 			<Separator />
-			<Collapsible.Root class="my-2 w-fit space-y-1">
+			<Collapsible.Root class="mt-2 mb-4 w-fit space-y-1">
 				{#if problem.answer.type == 'proof'}
 					Answer: Proof
 				{:else}
@@ -211,6 +256,15 @@
 						<Tooltip.Trigger>{problem.metadata.difficulty?.toFixed(1) ?? '?'}</Tooltip.Trigger>
 						<Tooltip.Content>
 							<p>Difficulty: {problem.metadata.difficulty?.toFixed(2) ?? '?'}/10</p>
+						</Tooltip.Content>
+					</Tooltip.Root>
+				</div>
+				<div class="flex items-center">
+					<PenLine class="mr-1 h-3 w-3" />
+					<Tooltip.Root>
+						<Tooltip.Trigger>{problem.organization ?? '?'}</Tooltip.Trigger>
+						<Tooltip.Content>
+							<p>By Organization: {problem.organization ?? '?'}</p>
 						</Tooltip.Content>
 					</Tooltip.Root>
 				</div>
