@@ -14,12 +14,16 @@
 	import ArrowUpDown from 'lucide-svelte/icons/arrow-up-down';
 
 	import * as Table from '$lib/components/ui/table';
+	import Input from '$lib/components/ui/input/input.svelte';
 	import { Button } from '$lib/components/ui/button';
 
 	import DataTableCheckbox from './table-checkbox.svelte';
 	import DataTableActions from './table-actions.svelte';
+	import { parseDate } from '@internationalized/date';
 
 	export let data: DisplayProblem[], selected_problem: string;
+
+	const collator = new Intl.Collator('en', { numeric: true, sensitivity: 'base' });
 
 	const table = createTable(readable(data), {
 		page: addPagination({
@@ -60,15 +64,25 @@
 		}),
 		table.column({
 			accessor: 'common_title',
-			header: 'Title'
+			header: 'Title',
+			plugins: {
+				sort: {
+					compareFn: (a, b) => collator.compare(a, b)
+				}
+			}
 		}),
 		table.column({
 			accessor: 'source',
-			header: 'Source'
+			header: 'Source',
+			plugins: {
+				sort: {
+					disable: true,
+				}
+			}
 		}),
 		table.column({
-			accessor: ({ id, collection, metadata: { tags, difficulty, source_href } }) => {
-				return { id, collection, tags, difficulty, source_href };
+			accessor: ({ id, collection, date, metadata: { tags, difficulty, source_href } }) => {
+				return { id, collection, date, tags, difficulty, source_href };
 			},
 			header: '',
 			cell: ({ value }) => {
@@ -86,8 +100,13 @@
 				},
 				colFilter: {
 					fn: ({ filterValue, value }) => {
+						let date = parseDate(value.date);
+
 						return (!filterValue.collection || value.collection === filterValue.collection)
 						&& (!value.difficulty || filterValue.minDifficulty <= value.difficulty && value.difficulty <= filterValue.maxDifficulty)
+						&& (!filterValue.ids || filterValue.ids.includes(value.id))
+						&& (!filterValue.minDate || !filterValue.maxDate || (date.compare(filterValue.minDate) >= 0 && 
+						date.compare(filterValue.maxDate) <= 0))
 						// && (!filterValue.tags || value.tags === filterValue.tags)
 					}
 				}
@@ -116,7 +135,7 @@
 	$: pluginTitleFilter.set(titleFilter ?? '');
 	$: otherFilter && pluginOtherFilter.set({
 		"": otherFilter
-	}), console.log(otherFilter);
+	});
 </script>
 
 <div class="flex w-full flex-col">
@@ -130,10 +149,8 @@
 								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
 									<Table.Head
 										{...attrs}
-										class={cn('[&:has([role=checkbox])]:pl-3') +
-											(cell.id === 'source' ? ' !text-center' : '')}
 									>
-										{#if cell.id === 'source'}
+										{#if cell.id === 'common_title'}
 											<Button class="mx-auto" variant="ghost" on:click={props.sort.toggle}>
 												<Render of={cell.render()} />
 												<ArrowUpDown class={'ml-2 h-4 w-4'} />
@@ -169,10 +186,7 @@
 													<Render of={cell.render()} />
 												</Button>
 											</div>
-										{:else if cell.id === 'source'}
-											<div class="text-center">
-												<Render of={cell.render()} />
-											</div>
+										
 										{:else}
 											<div class="text-left">
 												<Render of={cell.render()} />
@@ -189,20 +203,21 @@
 	</div>
 	<div class="flex items-center justify-between space-x-4 py-4">
 		<div class="mr-auto text-sm text-muted-foreground">
-			{Object.keys($selectedDataIds).length} of {$rows.length} row(s) selected.
+			{Object.keys($selectedDataIds).length} of {$rows.length + "/" + data.length} problem(s) selected.
 		</div>
 		<div class="flex items-center justify-end space-x-4">
 			<Button
 				variant="outline"
 				size="sm"
-				on:click={() => ($pageIndex = $pageIndex - 1)}
+				on:click={() => ($pageIndex = Number($pageIndex) - 1)}
 				disabled={!$hasPreviousPage}>Previous</Button
 			>
+			<Input type="number" placeholder="0" min={0} max={Math.ceil($rows.length/5) - 1} bind:value={$pageIndex} class="h-9 max-w-[80px]" />
 			<Button
 				variant="outline"
 				size="sm"
 				disabled={!$hasNextPage}
-				on:click={() => ($pageIndex = $pageIndex + 1)}>Next</Button
+				on:click={() => ($pageIndex = Number($pageIndex) + 1)}>Next</Button
 			>
 		</div>
 	</div>

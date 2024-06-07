@@ -1,9 +1,13 @@
+import type { CalendarDate } from "@internationalized/date";
+
 declare global {
     interface DisplayProblem {
         id: string;
         slug: string;
+        title: string;
         common_title: string;
         source: string;
+        date: string;
         collection: string;
         metadata: {
             tags?: string[];
@@ -23,8 +27,11 @@ declare global {
     }
 
     type tableOtherFilters = {
+        ids?: string[] | null;
 		minDifficulty: number;
 		maxDifficulty: number;
+        minDate?: CalendarDate | undefined;
+        maxDate?: CalendarDate | undefined;
 		collection: string;
 	}
 }

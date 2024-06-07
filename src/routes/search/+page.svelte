@@ -1,16 +1,15 @@
 <script lang="ts">
-	import { Badge } from '$lib/components/ui/badge/index.js';
-
 	import TableFilter from './table-filter.svelte';
 	import DataTable from './table.svelte';
 	import Problem from './problem.svelte';
-	import { writable, type Writable } from 'svelte/store';
 
 	export let data;
 
 	let problems: DisplayProblem[] = data.problems as DisplayProblem[];
 	let titleFilter: string = '';
+	let today = new Date();
 	let otherFilter: tableOtherFilters = {
+		ids: null,
 		minDifficulty: 0,
 		maxDifficulty: 10,
 		collection: ''

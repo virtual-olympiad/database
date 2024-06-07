@@ -20,7 +20,7 @@
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content side="right">
 		<DropdownMenu.Group>
-			<DropdownMenu.Item>
+			<DropdownMenu.Item disabled>
 				Open in Judge
 			</DropdownMenu.Item>
 			<DropdownMenu.Item target="_blank" rel="noreferrer" href={source_href}>
@@ -29,6 +29,5 @@
 		</DropdownMenu.Group>
 		<DropdownMenu.Separator />
 		<DropdownMenu.Item on:click={() => navigator.clipboard.writeText(id)}>Copy Problem ID</DropdownMenu.Item>
-		<DropdownMenu.Item>Copy Source ID</DropdownMenu.Item>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>

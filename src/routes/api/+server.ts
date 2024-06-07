@@ -1,12 +1,14 @@
 import { error, json } from '@sveltejs/kit';
 import { supabase } from '$lib/supabase';
+import { CalendarDate, parseDate } from '@internationalized/date';
 
 const collator = new Intl.Collator('en', { numeric: true, sensitivity: 'base' });
 
 export async function GET({ url }) {
-	const problem_id = url.searchParams.get('problem_id') ?? '';
+	const problemId = url.searchParams.get('problemId') ?? '';
+	const textString = url.searchParams.get('textString') ?? '';
 
-	if (problem_id) {
+	if (problemId) {
 		let {
 			data,
 			status,
@@ -18,9 +20,11 @@ export async function GET({ url }) {
 				`
 					id,
 					slug,
+					title,
 					common_title,
 					vodb_sources (
 						edition,
+						date,
 						vodb_collections (
 							common_title,
 							vodb_organizations (
@@ -36,7 +40,7 @@ export async function GET({ url }) {
 					created_at
 				`
 			)
-			.eq('id', problem_id)
+			.eq('id', problemId)
 			.order('slug')
 			.limit(1);
 
@@ -44,14 +48,16 @@ export async function GET({ url }) {
 			error(status, statusText);
 		}
 
-		const problem = data?.map(({id, slug, common_title, vodb_sources, content, duplicate, original, answer, metadata, created_at })=> {
+		const problem = data?.map(({id, slug, title, common_title, vodb_sources, content, duplicate, original, answer, metadata, created_at })=> {
 			const source = vodb_sources as any;
 
 			return {
 				id,
-				slug, 
+				slug,
+				title,
 				common_title,
 				source:  source.vodb_collections.common_title + ' ' + source.edition,
+				date: source.date,
 				edition: source.edition,
 				collection: source.vodb_collections.common_title,
 				organization: source.vodb_collections.vodb_organizations.common_title,
@@ -71,6 +77,31 @@ export async function GET({ url }) {
 		return json(problem[0]);
 	}
 
+	if (textString){
+		let {
+			data,
+			status,
+			statusText,
+			error: e
+		} = await supabase
+			.from('vodb_problems')
+			.select(
+				`
+					id
+				`
+			)
+			.textSearch('fts', textString, {
+				type: 'plain',
+				config: 'english'
+			});
+	
+		if (e) {
+			error(status, statusText);
+		}
+
+		return json(data);
+	}
+
 	let {
 		data,
 		status,
@@ -82,9 +113,11 @@ export async function GET({ url }) {
 			`
 				id,
 				slug,
+				title,
 				common_title,
 				vodb_sources (
 					edition,
+					date,
 					vodb_collections (
 						common_title
 					)
@@ -100,14 +133,16 @@ export async function GET({ url }) {
 		error(status, statusText);
 	}
 
-	const problems = data?.map(({ id, slug, common_title, vodb_sources, tags, difficulty, source_href }) => {
+	const problems = data?.map(({ id, slug, title, common_title, vodb_sources, tags, difficulty, source_href }) => {
 		const source = vodb_sources as any;
 
 		return {
 			id,
 			slug,
+			title,
 			common_title,
 			source: source.vodb_collections.common_title + ' ' + source.edition,
+			date: source.date,
 			collection: source.vodb_collections.common_title,
 			metadata: {
 				tags,

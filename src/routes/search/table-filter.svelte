@@ -6,10 +6,20 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Command from '$lib/components/ui/command/index.js';
 	import * as Popover from '$lib/components/ui/popover/index.js';
+	import * as Tooltip from '$lib/components/ui/tooltip';
 	import type { DateRange } from 'bits-ui';
 	import { RangeCalendar } from '$lib/components/ui/range-calendar/index.js';
 
-	import { Search, Check, ChevronsUpDown, CalendarIcon } from 'lucide-svelte';
+	import {
+		Search,
+		Check,
+		ChevronsUpDown,
+		CalendarIcon,
+		MessageSquareDiff,
+		Pi,
+		SquareRadical,
+		LoaderCircle
+	} from 'lucide-svelte';
 
 	import { writable, type Writable } from 'svelte/store';
 
@@ -44,7 +54,7 @@
 	let today = new Date();
 
 	let dateValue: DateRange | undefined = {
-		start: new CalendarDate(today.getFullYear(), today.getMonth() + 1, today.getDate()).subtract({ years: 1 }),
+		start: new CalendarDate(1950, 1, 1),
 		end: new CalendarDate(today.getFullYear(), today.getMonth() + 1, today.getDate())
 	};
 
@@ -69,9 +79,54 @@
 		}
 	];
 
-	export let collections: { value: string, label: string }[], titleFilter: string, otherFilter: tableOtherFilters;
+	const answerType = [
+		{
+			value: 'proof',
+			label: 'Proof'
+		},
+		{
+			value: 'number:integer',
+			label: 'Integer Answer'
+		},
+		{
+			value: 'select:single',
+			label: 'Multiple Choice'
+		}
+	];
+
+	let searchingContent = false;
+	let contentQuery = '';
+
+	const searchContent = async () => {
+		if (searchingContent){
+			return;
+		}
+
+		searchingContent = true;
+
+		if (contentQuery == ''){
+			otherFilter.ids = null;
+			searchingContent = false;
+			return;
+		}
+
+		let res = await fetch('/api?textString=' + encodeURIComponent(contentQuery));
+		let data: {
+			id: string;
+		}[] = await res.json();
+
+		otherFilter.ids = data.map(({ id }) => id);
+
+		searchingContent = false;
+	};
+
+	export let collections: { value: string; label: string }[],
+		titleFilter: string,
+		otherFilter: tableOtherFilters;
 
 	$: otherFilter.collection = collectionValue;
+	$: otherFilter.minDate = dateValue?.start as CalendarDate | undefined;
+	$: otherFilter.maxDate = dateValue?.end as CalendarDate | undefined;
 </script>
 
 <form class="mb-4 grid w-full items-start gap-6">
@@ -133,25 +188,68 @@
 		<div class="flex flex-col gap-4 lg:grid lg:grid-cols-2">
 			<div class="flex flex-col gap-3">
 				<Label for="content">Content</Label>
-				<Textarea
-					id="content"
-					placeholder="Search problem content ($\LaTeX$ supported)..."
-					class="h-full lg:resize-none"
-				/>
+				<div
+					class="flex h-full min-h-28 resize-y flex-col overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring lg:resize-none"
+				>
+					<Textarea
+						id="content"
+						placeholder={`Search problem content (Numbers & TeX supported, try "sqrt". Improvements soon)...`}
+						class="min-h-12 grow resize-none border-0 p-2 shadow-none focus-visible:ring-0"
+						bind:value={contentQuery}
+					/>
+					<div class="flex items-center p-2 pt-0">
+						<Tooltip.Root>
+							<Tooltip.Trigger asChild let:builder>
+								<Button variant="ghost" size="icon" builders={[builder]}>
+									<SquareRadical class="size-5" />
+									<span class="sr-only">Input TeX (coming soon)</span>
+								</Button>
+							</Tooltip.Trigger>
+							<Tooltip.Content side="right">Input TeX (coming soon)</Tooltip.Content>
+						</Tooltip.Root>
+						{#if searchingContent}
+							<Button disabled type="submit" size="sm" class="ml-auto gap-1.5">
+								<LoaderCircle class="size-4 animate-spin" />
+								Query Content
+							</Button>
+						{:else}
+							<Button on:click={searchContent} type="submit" size="sm" class="ml-auto gap-1.5">
+								<Search class="size-4" />
+								Query Content
+							</Button>
+						{/if}
+					</div>
+				</div>
 			</div>
 			<div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
 				<div class="flex flex-col gap-3">
 					<Label for="min-difficulty">Min Difficulty</Label>
-					<Input id="min-difficulty" type="number" placeholder="0.0" min={0} max={10} step={0.1} bind:value={otherFilter.minDifficulty} />
+					<Input
+						id="min-difficulty"
+						type="number"
+						placeholder="0.0"
+						min={0}
+						max={10}
+						step={0.1}
+						bind:value={otherFilter.minDifficulty}
+					/>
 				</div>
 				<div class="flex flex-col gap-3">
 					<Label for="max-difficulty">Max Difficulty</Label>
-					<Input id="max-difficulty" type="number" placeholder="10.0" min={0} max={10} step={0.1} bind:value={otherFilter.maxDifficulty} />
+					<Input
+						id="max-difficulty"
+						type="number"
+						placeholder="10.0"
+						min={0}
+						max={10}
+						step={0.1}
+						bind:value={otherFilter.maxDifficulty}
+					/>
 				</div>
 				<div class="col-span-2 flex flex-col gap-3 sm:col-span-1">
 					<Label for="topic">Topic</Label>
 					<Select.Root>
-						<Select.Trigger id="topic" class="items-start [&_[data-description]]:hidden">
+						<Select.Trigger disabled id="topic" class="items-start [&_[data-description]]:hidden">
 							<Select.Value placeholder="Select a topic" />
 						</Select.Trigger>
 						<Select.Content>
@@ -161,7 +259,7 @@
 						</Select.Content>
 					</Select.Root>
 				</div>
-				<div class="flex flex-col col-span-2 gap-2">
+				<div class="col-span-2 flex flex-col gap-3">
 					<Label for="date-range">Date Range</Label>
 					<Popover.Root openFocus>
 						<Popover.Trigger asChild let:builder>
@@ -194,16 +292,24 @@
 								bind:value={dateValue}
 								bind:startValue
 								initialFocus
-								numberOfMonths={2}
 								placeholder={dateValue?.start}
 							/>
 						</Popover.Content>
 					</Popover.Root>
 				</div>
-				<Button class="col-start-[-2] mt-auto w-full gap-1.5">
-					<Search class="hidden size-3.5 xl:block" />
-					Query Database
-				</Button>
+				<div class="col-start-[-2] flex flex-col gap-3">
+					<Label for="topic">Answer Type</Label>
+					<Select.Root>
+						<Select.Trigger disabled id="topic" class="items-start [&_[data-description]]:hidden">
+							<Select.Value placeholder="Select a type" />
+						</Select.Trigger>
+						<Select.Content>
+							{#each answerType as { label, value }}
+								<Select.Item {value}>{label}</Select.Item>
+							{/each}
+						</Select.Content>
+					</Select.Root>
+				</div>
 			</div>
 		</div>
 	</fieldset>
