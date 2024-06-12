@@ -1,18 +1,19 @@
 const links = {
-	github: 'https://github.com/virtual-olympiad/vodb',
-	voly: 'https://voly.mathetal.org',
-	vodb: 'https://vodb.mathetal.org',
-	voj: 'https://voj.mathetal.org',
+	github: 'https://github.com/virtual-olympiad/database',
+	voly: "https://volympiad.org",
+	voa: 'https://arena.volympiad.org',
+	vodb: 'https://db.volympiad.org',
+	voj: 'https://judge.volympiad.org',
 	polarity: 'https://polarity.sh'
 };
 
 const site = {
 	site_name: 'Virtual Olympiad',
 	name: 'VODB ⸱ Virtual Olympiad Database',
-	url: 'https://vodb.mathetal.org',
-	ogImage: 'https://vodb.mathetal.org/vodb.png',
+	url: 'https://db.volympiad.org',
+	ogImage: 'https://db.volympiad.org/vodb.png',
 	description: 'Massive database of categorized and indexed contest problems.',
-	keywords: `Virtual Olympiad,database,olympiad,problems,VO,VOLY,VOJ,VODB,math,science`
+	keywords: `Virtual Olympiad,database,olympiad,problems,VO,VOLY,VOJ,VODB,VOA,math,science`
 };
 
 const nav = [
